@@ -10,7 +10,7 @@
 @media (prefers-color-scheme:dark){:root{--bg:#1b141e;--ink:#f3ecf5;--muted:#a99bb0;--plum:#e8c9ec;--orchid:#d878b5;--line:#3a2d3f;--card:#251b29;--ok:#6fd3a0;--err:#ff8a80;--hover:#2e2233}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;padding-bottom:110px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;padding-bottom:140px}
 header{padding:28px 20px 12px;max-width:720px;margin:0 auto}
 h1{margin:0 0 4px;font-size:1.6rem;color:var(--plum)}
 .who{margin:0;color:var(--muted)}
@@ -46,11 +46,19 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--orchid);outline
 .s-q{min-width:28px;text-align:center;font-weight:700}
 .rem{background:none;border:0;color:var(--err);font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;padding:8px 4px}
 
-footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));z-index:200}
+/* NOVO ESTILO DO RODAPÉ (INCLUINDO BARRA DE PROGRESSO) */
+footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:200; display: flex; flex-direction: column;}
+.meta-box{background:var(--bg);padding:10px 20px;text-align:center;font-size:.85rem; border-bottom:1px solid var(--line);}
+.meta-texto{font-weight:600;color:var(--plum);margin-bottom:6px}
+.meta-ok{color:var(--ok);font-size:.95rem;}
+.meta-barra-bg{height:8px;background:var(--line);border-radius:4px;overflow:hidden;max-width:720px;margin:0 auto;}
+.meta-barra-fill{height:100%;width:0%;transition:width .4s ease, background .4s ease;}
+.bar-container{padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));}
+
 .bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:16px}
 .tot{flex:1;text-align:left;background:none;border:0;padding:0;font:inherit;color:var(--ink);cursor:pointer}
 .tot:disabled{cursor:default}
-.tot small{display:block;color:var(--orchid);font-weight:600}
+.tot small{display:block;color:var(--orchid);font-weight:600;margin-bottom:2px}
 .tot b{font-size:1.2rem}
 .principal{background:var(--plum);color:var(--bg);border:0;border-radius:10px;padding:14px 22px;font:inherit;font-weight:700;cursor:pointer}
 .principal:disabled{opacity:.4;cursor:not-allowed}
@@ -81,12 +89,22 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 </header>
 <main id="lista"><div id="loading">Carregando catálogo de produtos...</div></main>
 
-<footer id="rodape"><div class="bar">
-  <button class="tot" id="verItens" disabled aria-label="Ver itens do pedido">
-    <small id="qtd">0 itens</small><b id="total">R$ 0,00</b>
-  </button>
-  <button class="principal" id="enviar" disabled>Revisar pedido</button>
-</div></footer>
+<footer id="rodape">
+  <!-- BARRA DE PROGRESSO DO ESTÁGIO -->
+  <div id="metaContainer" class="meta-box" hidden>
+      <div class="meta-texto" id="metaTexto"></div>
+      <div class="meta-barra-bg"><div class="meta-barra-fill" id="metaFill"></div></div>
+  </div>
+  
+  <div class="bar-container">
+      <div class="bar">
+        <button class="tot" id="verItens" disabled aria-label="Ver itens do pedido">
+          <small id="qtd">0 itens</small><b id="total">R$ 0,00</b>
+        </button>
+        <button class="principal" id="enviar" disabled>Revisar pedido</button>
+      </div>
+  </div>
+</footer>
 
 <div id="overlay" hidden></div>
 <section id="sheet" role="dialog" aria-modal="true" aria-label="Itens do pedido" hidden>
@@ -103,15 +121,22 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   <div class="check" aria-hidden="true">✓</div>
   <h2>Pedido enviado com sucesso!</h2>
   <p id="okResumo"></p>
-  <p>Recebemos o seu pedido. Em breve entraremos em contato.</p>
+  <p>Recebemos o seu pedido. Em breve o vendedor responsável entrará em contato.</p>
   <button class="principal" id="novo">Fazer um novo pedido</button>
 </section>
 
 <script>
-// ===== CONFIGURAÇÃO DOS WEBHOOKS =====
+// ============================================
+// CONFIGURAÇÕES GERAIS
+// ============================================
 const URL_BUSCAR_PRODUTOS = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/produtos-curso";
 const URL_ENVIAR_PEDIDO   = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/receber-pedido-curso";
-// =====================================
+
+// CONFIGURAÇÃO DO PRÊMIO / META DE VENDAS
+const META_ATIVA  = true; // Mude para false para esconder a barra
+const META_VALOR  = 3000.00; // Valor que a cliente precisa atingir
+const META_PREMIO = "Estágio Bonificado"; // Nome do prêmio
+// ============================================
 
 let PRODUTOS = [];
 let MARCA_ATUAL = null;
@@ -123,16 +148,20 @@ const cliente  = q.get("cliente");
 const vendedor = q.get("vendedor");
 const curso    = q.get("curso") || "CURSO";
 const nome     = q.get("nome");
-const qtds     = {};
 const linkOk   = !!cliente && !!vendedor;
 const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// SISTEMA DE SALVAMENTO NO CELULAR (Local Storage)
+const chaveCarrinho = "carrinho_curso_" + (cliente || "teste");
+let qtds = {};
+try { const salvo = localStorage.getItem(chaveCarrinho); if (salvo) qtds = JSON.parse(salvo); } catch(e){}
 
 $("quem").textContent = !cliente ? "Atenção: Falta o código do cliente no link."
   : !vendedor ? "Atenção: Falta o código do vendedor no link."
   : "Pedido para: " + (nome || "cliente " + cliente);
 
-/* ---------- carrinho ---------- */
+/* ---------- carrinho e meta ---------- */
 function totais(){
   let n = 0, t = 0;
   PRODUTOS.forEach(p => { const k = qtds[p.id_produto] || 0; n += k; t += k * p.preco; });
@@ -145,19 +174,41 @@ function resumo(){
   $("total").textContent = brl(t);
   $("enviar").disabled = !linkOk || n === 0;
   $("verItens").disabled = n === 0;
+  
   if (n === 0 && !$("sheet").hidden) fecharSheet();
+
+  // ATUALIZA A BARRA DE META
+  if (META_ATIVA) {
+      $("metaContainer").hidden = false;
+      let falta = META_VALOR - t;
+      let pct = (t / META_VALOR) * 100;
+      if (pct > 100) pct = 100;
+      
+      $("metaFill").style.width = pct + "%";
+      
+      if (t >= META_VALOR) {
+          $("metaTexto").innerHTML = `<span class="meta-ok">🎉 Meta atingida! Você garantiu o ${META_PREMIO}!</span>`;
+          $("metaFill").style.background = "var(--ok)";
+      } else {
+          $("metaTexto").innerHTML = `Faltam <b>${brl(falta)}</b> para ganhar: ${META_PREMIO}`;
+          $("metaFill").style.background = "var(--orchid)";
+      }
+  }
 }
 
 function setQtd(id, v){
   v = Math.max(0, Math.min(999, parseInt(v) || 0));
   qtds[id] = v;
+  // Salva no navegador da cliente
+  try { localStorage.setItem(chaveCarrinho, JSON.stringify(qtds)); } catch(e){}
+
   const el = $("i" + id);
   if (el) { el.querySelector("input").value = v; el.classList.toggle("on", v > 0); }
   resumo();
   if (!$("sheet").hidden) renderSheet();
 }
 
-/* ---------- janela "Seu pedido" ---------- */
+/* ---------- janela "Revisar pedido" ---------- */
 function abrirSheet(){ $("sMsg").textContent = ""; $("confirmar").disabled = false; $("sheet").hidden = false; $("overlay").hidden = false; renderSheet(); }
 function fecharSheet(){ $("sheet").hidden = true; $("overlay").hidden = true; }
 
@@ -173,7 +224,7 @@ function renderSheet(){
       row.innerHTML = `<div class="info"><div class="nome">${esc(p.nome)}</div>
         <div class="preco-normal">${k} × ${brl(p.preco)} = <b>${brl(k * p.preco)}</b></div></div>
         <div class="qty"><button data-d="-1" aria-label="Diminuir">−</button><span class="s-q">${k}</span><button data-d="1" aria-label="Aumentar">+</button></div>
-        <button class="rem" aria-label="Remover ${esc(p.nome)}">Remover</button>`;
+        <button class="rem" aria-label="Remover">🗑️</button>`;
       row.querySelectorAll(".qty button").forEach(b => b.onclick = () => setQtd(p.id_produto, (qtds[p.id_produto] || 0) + +b.dataset.d));
       row.querySelector(".rem").onclick = () => setQtd(p.id_produto, 0);
       body.appendChild(row);
@@ -189,9 +240,11 @@ async function enviarPedido(){
   const itens = PRODUTOS.filter(p => qtds[p.id_produto] > 0)
     .map(p => ({id_produto: p.id_produto, quantidade: qtds[p.id_produto], preco: p.preco}));
   if (!itens.length) return;
+  
   enviando = true;
   $("confirmar").disabled = true;
-  $("sMsg").className = ""; $("sMsg").textContent = "Enviando...";
+  $("sMsg").className = ""; $("sMsg").textContent = "Lançando pedido no sistema...";
+  
   try {
     const r = await fetch(URL_ENVIAR_PEDIDO, {
       method: "POST",
@@ -199,9 +252,12 @@ async function enviarPedido(){
       body: JSON.stringify({curso, id_cliente: cliente, id_vendedor: vendedor, itens})
     });
     if (!r.ok) throw new Error(r.status);
+    
+    // Apaga a memória porque o pedido já foi enviado
+    try { localStorage.removeItem(chaveCarrinho); } catch(e){}
     mostrarSucesso();
   } catch (e) {
-    $("sMsg").className = "err"; $("sMsg").textContent = "Erro ao enviar. Tente de novo.";
+    $("sMsg").className = "err"; $("sMsg").textContent = "Erro ao enviar. Verifique a internet e tente de novo.";
     $("confirmar").disabled = false;
   } finally { enviando = false; }
 }
@@ -217,6 +273,7 @@ function mostrarSucesso(){
 
 $("novo").onclick = () => {
   Object.keys(qtds).forEach(k => delete qtds[k]);
+  try { localStorage.removeItem(chaveCarrinho); } catch(e){}
   MARCA_ATUAL = null;
   ["topo", "lista", "rodape"].forEach(id => $(id).hidden = false);
   $("sucesso").hidden = true;
@@ -230,11 +287,24 @@ $("fechar").onclick = fecharSheet;
 $("overlay").onclick = fecharSheet;
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) fecharSheet(); });
 
-/* ---------- catálogo ---------- */
+/* ---------- catálogo e limpeza de dados ---------- */
 async function carregarProdutos(){
   try {
     const resposta = await fetch(URL_BUSCAR_PRODUTOS);
-    PRODUTOS = await resposta.json();
+    const listaSuja = await resposta.json();
+    
+    // FILTRO: Tira material de apoio e itens indisponíveis
+    PRODUTOS = listaSuja.filter(p => {
+        const n = (p.nome || "").toLowerCase();
+        const m = (p.marca || "").toLowerCase();
+        const c = (p.categoria || "").toLowerCase();
+        
+        const isIndisponivel = n.includes("indisponivel") || n.includes("indisponível");
+        const isApoio = m === "material apoio" || m === "material de apoio" || c === "material apoio" || c === "material de apoio";
+        
+        return !isIndisponivel && !isApoio;
+    });
+
     montarTela();
   } catch (e) {
     $("lista").innerHTML = "<div id='loading'>Erro ao carregar os produtos.</div>";
@@ -260,11 +330,11 @@ function desenharTelaDeMarcas(container){
   const grid = document.createElement("div");
   grid.className = "grid-opcoes";
   marcas.forEach(marca => {
-    const qm = PRODUTOS.filter(p => p.marca === marca && qtds[p.id_produto] > 0).length;
+    const qm = PRODUTOS.filter(p => p.marca === marca && qtds[p.id_produto] > 0).reduce((acc, p) => acc + qtds[p.id_produto], 0);
     const card = document.createElement("div");
     card.className = "card-opcao";
     card.innerHTML = `<div class="card-titulo">${esc(marca)}</div>` +
-      (qm ? `<div class="badge">${qm} selecionado${qm > 1 ? "s" : ""}</div>` : "");
+      (qm ? `<div class="badge">${qm} na sacola</div>` : "");
     card.onclick = () => { MARCA_ATUAL = marca; montarTela(); window.scrollTo(0, 0); };
     grid.appendChild(card);
   });
