@@ -4,58 +4,80 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pedido do curso</title>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf7fb;--ink:#231a26;--muted:#6f6474;--plum:#4a1d4e;--orchid:#b4488d;--line:#e6dce8;--card:#fff;--ok:#1f7a4d;--err:#b3261e;--hover:#fdf5fc}
-@media (prefers-color-scheme:dark){:root{--bg:#1b141e;--ink:#f3ecf5;--muted:#a99bb0;--plum:#e8c9ec;--orchid:#d878b5;--line:#3a2d3f;--card:#251b29;--ok:#6fd3a0;--err:#ff8a80;--hover:#2e2233}}
+:root{--bg:#faf7fb;--ink:#231a26;--muted:#6f6474;--plum:#4a1d4e;--orchid:#b4488d;--line:#e6dce8;--card:#fff;--ok:#1f7a4d;--okbg:#eef7f2;--err:#b3261e;--hover:#fdf5fc;--skel:#efe6f1}
+@media (prefers-color-scheme:dark){:root{--bg:#1b141e;--ink:#f3ecf5;--muted:#a99bb0;--plum:#e8c9ec;--orchid:#d878b5;--line:#3a2d3f;--card:#251b29;--ok:#6fd3a0;--okbg:#16382a;--err:#ff8a80;--hover:#2e2233;--skel:#2d2233}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;padding-bottom:140px}
-header{padding:28px 20px 12px;max-width:720px;margin:0 auto}
-h1{margin:0 0 4px;font-size:1.6rem;color:var(--plum)}
-.who{margin:0;color:var(--muted)}
-main{max-width:720px;margin:0 auto;padding:0 20px}
 button:focus-visible,input:focus-visible{outline:3px solid var(--orchid);outline-offset:2px}
+main{max-width:960px;margin:0 auto;padding:0 20px}
+
+/* TOPO */
+.hero{background:linear-gradient(135deg,#4a1d4e,#9b3a7c);color:#fff;padding:26px 20px 24px}
+.hero-in{max-width:960px;margin:0 auto}
+.hero img{height:36px;margin-bottom:12px;display:block}
+.eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:700}
+.hero h1{margin:6px 0 4px;font-size:1.8rem;font-weight:800;text-transform:capitalize}
+.who{margin:0;opacity:.92;font-size:.95rem}
 
 .sticky-header{position:sticky;top:0;background:var(--bg);z-index:100;padding:10px 20px 15px;margin:0 -20px;border-bottom:1px solid var(--line);box-shadow:0 4px 10px rgba(0,0,0,.03)}
 .sticky-header h2{font-size:1.1rem;margin:12px 0 8px;color:var(--plum)}
-.sticky-header .search-box{margin-top:6px}
+.search-box{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;color:var(--ink);font-size:1rem}
 
 .grid-opcoes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.card-opcao{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.03);transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.card-opcao:hover,.card-opcao:active{border-color:var(--orchid);background:var(--hover)}
-.card-titulo{font-weight:700;font-size:1rem;color:var(--plum);line-height:1.3}
+@media(min-width:820px){.grid-opcoes{grid-template-columns:repeat(3,1fr)}}
+.card-opcao{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 12px;text-align:center;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.03);transition:.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.card-opcao:hover,.card-opcao:active{border-color:var(--orchid);background:var(--hover);transform:translateY(-1px)}
+.card-titulo{font-weight:800;font-size:1.05rem;color:var(--plum);line-height:1.3}
 .badge{background:var(--orchid);color:#fff;font-size:.75rem;font-weight:700;border-radius:20px;padding:3px 10px}
-
 .btn-voltar{background:transparent;border:1px solid var(--plum);color:var(--plum);padding:8px 16px;border-radius:20px;font-weight:600;cursor:pointer;font-size:.9rem}
-.search-box{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;color:var(--ink);font-size:1rem}
+.vazio{text-align:center;color:var(--muted);padding:30px 0}
+
 .categoria-bloco{margin-top:24px}
-.categoria-titulo{font-size:1.1rem;margin-bottom:12px;color:var(--plum);border-bottom:2px solid var(--orchid);padding-bottom:6px}
+.categoria-titulo{font-size:1.1rem;margin-bottom:12px;color:var(--plum);border-bottom:2px solid var(--orchid);padding-bottom:6px;font-weight:700}
+.lista-itens{display:grid;grid-template-columns:1fr;gap:8px;margin-top:16px}
+.categoria-bloco .lista-itens{margin-top:0}
+@media(min-width:820px){.lista-itens{grid-template-columns:1fr 1fr}}
 
-.item,.s-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px}
-.item.on{border-color:var(--orchid)}
+.item,.s-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.s-item{margin-bottom:8px}
+.item.on{border-color:var(--orchid);box-shadow:0 0 0 1px var(--orchid)}
+.foto{width:56px;height:56px;border-radius:8px;object-fit:cover;flex:none;background:var(--skel)}
 .info{flex:1;min-width:0}
-.nome{font-weight:600;font-size:.95rem;line-height:1.2}
-.bloco-preco{display:flex;align-items:baseline;gap:8px;margin-top:6px}
-.preco-de{font-size:.85rem;color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(179,38,30,.5);text-decoration-thickness:1px;font-weight:600}
-.preco-por{font-size:1.1rem;color:var(--ok);font-weight:800;background:#eef7f2;padding:2px 8px;border-radius:6px; margin-left: 2px;}
+.nome{display:flex;align-items:baseline;gap:8px;line-height:1.2}
+.tom{font-weight:800;font-size:1.3rem;color:var(--plum)}
+.desc{font-weight:600;font-size:.9rem}
+.bloco-preco{display:flex;align-items:baseline;gap:8px;margin-top:6px;flex-wrap:wrap}
+.preco-de{font-size:.85rem;color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(179,38,30,.5);font-weight:600}
+.preco-por{font-size:1.05rem;color:var(--ok);font-weight:800;background:var(--okbg);padding:2px 8px;border-radius:6px}
 .preco-normal{font-size:.9rem;color:var(--muted);font-weight:600;margin-top:4px}
+
 .qty{display:flex;align-items:center;gap:6px}
-.qty button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1.2rem;cursor:pointer;touch-action:manipulation}
-.qty input{width:52px;height:36px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-weight:700}
+.stepper{display:flex;align-items:center;gap:6px}
+.qty button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1.3rem;cursor:pointer;touch-action:manipulation}
+.qty .add{width:auto;height:44px;border-radius:10px;padding:0 16px;background:var(--plum);color:var(--bg);border:0;font-weight:700;font-size:.9rem}
+.item.on .add{display:none}
+.item:not(.on) .stepper{display:none}
+.qty input{width:52px;height:44px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-weight:700}
 .s-q{min-width:28px;text-align:center;font-weight:700}
-.rem{background:none;border:0;color:var(--err);font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;padding:8px 4px}
+.rem{background:none;border:0;color:var(--err);font:inherit;font-size:1.1rem;cursor:pointer;padding:8px 4px}
 
-/* ESTILO DO RODAPÉ (INCLUINDO BARRA DE PROGRESSO) */
-footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:200; display: flex; flex-direction: column;}
-.meta-box{background:var(--bg);padding:10px 20px;text-align:center;font-size:.85rem; border-bottom:1px solid var(--line);}
+/* CARREGANDO */
+.skel{height:74px;border-radius:12px;background:linear-gradient(90deg,var(--skel) 25%,var(--card) 50%,var(--skel) 75%);background-size:200% 100%;animation:sh 1.3s infinite;margin-bottom:8px}
+@keyframes sh{to{background-position:-200% 0}}
+#loading{text-align:center;padding:40px;color:var(--muted)}
+
+/* RODAPÉ + META */
+footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:200;display:flex;flex-direction:column}
+.meta-box{background:var(--bg);padding:10px 20px;text-align:center;font-size:.85rem;border-bottom:1px solid var(--line)}
 .meta-texto{font-weight:600;color:var(--plum);margin-bottom:6px}
-.meta-ok{color:var(--ok);font-size:.95rem;}
-.meta-barra-bg{height:8px;background:var(--line);border-radius:4px;overflow:hidden;max-width:720px;margin:0 auto;}
-.meta-barra-fill{height:100%;width:0%;transition:width .4s ease, background .4s ease;}
-.bar-container{padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));}
-
-.bar{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:16px}
+.meta-ok{color:var(--ok);font-size:.95rem}
+.meta-barra-bg{height:8px;background:var(--line);border-radius:4px;overflow:hidden;max-width:720px;margin:0 auto}
+.meta-barra-fill{height:100%;width:0%;transition:width .4s ease,background .4s ease}
+.bar-container{padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:16px}
 .tot{flex:1;text-align:left;background:none;border:0;padding:0;font:inherit;color:var(--ink);cursor:pointer}
 .tot:disabled{cursor:default}
 .tot small{display:block;color:var(--orchid);font-weight:600;margin-bottom:2px}
@@ -63,6 +85,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 .principal{background:var(--plum);color:var(--bg);border:0;border-radius:10px;padding:14px 22px;font:inherit;font-weight:700;cursor:pointer}
 .principal:disabled{opacity:.4;cursor:not-allowed}
 
+/* JANELA DE REVISÃO */
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:250}
 #sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:720px;max-height:85vh;display:flex;flex-direction:column;background:var(--bg);border-radius:16px 16px 0 0;z-index:300;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
@@ -71,39 +94,38 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 #sheetBody{overflow-y:auto;padding:8px 20px;flex:1}
 .sheet-foot{display:flex;align-items:center;gap:16px;padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--card)}
 .sheet-foot>div{flex:1}.sheet-foot small{display:block;color:var(--muted)}.sheet-foot b{font-size:1.2rem}
-#sMsg{padding:0 20px 8px;font-weight:600; text-align: right;}
+#sMsg{padding:0 20px 8px;font-weight:600;text-align:right}
 .ok{color:var(--ok)}.err{color:var(--err)}
 
+/* SUCESSO */
 #sucesso{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
 .check{width:84px;height:84px;border-radius:50%;background:var(--ok);color:#fff;font-size:3rem;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
 #sucesso h2{margin:0 0 8px;color:var(--plum);font-size:1.6rem}
 #sucesso p{margin:4px 0;color:var(--muted);max-width:340px}
 #sucesso .principal{margin-top:28px}
-#loading{text-align:center;padding:40px;color:var(--muted)}
 </style>
 </head>
 <body>
-<header id="topo">
-  <h1>Pedido do curso</h1>
+<header id="topo" class="hero"><div class="hero-in">
+  <img id="logo" alt="" hidden>
+  <div class="eyebrow" id="eyebrow">Pedido do curso</div>
+  <h1 id="saudacao">Bem-vinda</h1>
   <p class="who" id="quem"></p>
-</header>
-<main id="lista"><div id="loading">Carregando catálogo de produtos...</div></main>
+</div></header>
+
+<main id="lista"><div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></main>
 
 <footer id="rodape">
-  <!-- BARRA DE PROGRESSO DO ESTÁGIO -->
   <div id="metaContainer" class="meta-box" hidden>
-      <div class="meta-texto" id="metaTexto"></div>
-      <div class="meta-barra-bg"><div class="meta-barra-fill" id="metaFill"></div></div>
+    <div class="meta-texto" id="metaTexto"></div>
+    <div class="meta-barra-bg"><div class="meta-barra-fill" id="metaFill"></div></div>
   </div>
-  
-  <div class="bar-container">
-      <div class="bar">
-        <button class="tot" id="verItens" disabled aria-label="Ver itens do pedido">
-          <small id="qtd">0 itens</small><b id="total">R$ 0,00</b>
-        </button>
-        <button class="principal" id="enviar" disabled>Revisar pedido</button>
-      </div>
-  </div>
+  <div class="bar-container"><div class="bar">
+    <button class="tot" id="verItens" disabled aria-label="Ver itens do pedido">
+      <small id="qtd">0 itens</small><b id="total">R$ 0,00</b>
+    </button>
+    <button class="principal" id="enviar" disabled>Revisar pedido</button>
+  </div></div>
 </footer>
 
 <div id="overlay" hidden></div>
@@ -132,10 +154,12 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 const URL_BUSCAR_PRODUTOS = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/produtos-curso";
 const URL_ENVIAR_PEDIDO   = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/receber-pedido-curso";
 
-// CONFIGURAÇÃO DA META DE VENDAS
-const META_ATIVA  = true; // Mude para false para esconder a barra
-const META_VALOR  = 3000.00; // Valor que a cliente precisa atingir
-const META_PREMIO = "Estágio Bonificado"; // Nome do prêmio
+const LOGO_URL    = "";        // ex.: "logo.png" (deixe vazio para não mostrar)
+const FOTOS_PASTA = "";        // ex.: "fotos" -> procura fotos/foto_<id>.jpg (vazio = sem fotos)
+
+const META_ATIVA  = true;
+const META_VALOR  = 3000.00;
+const META_PREMIO = "Estágio Bonificado";
 // ============================================
 
 let PRODUTOS = [];
@@ -146,20 +170,31 @@ const $ = id => document.getElementById(id);
 const q = new URLSearchParams(location.search);
 const cliente  = q.get("cliente");
 const vendedor = q.get("vendedor");
-const curso    = q.get("curso") || "CURSO";
+const curso    = q.get("curso");
 const nome     = q.get("nome");
 const linkOk   = !!cliente && !!vendedor;
 const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-// SISTEMA DE SALVAMENTO NO CELULAR (Local Storage)
-const chaveCarrinho = "carrinho_curso_" + (cliente || "teste");
+const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
+const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
 let qtds = {};
-try { const salvo = localStorage.getItem(chaveCarrinho); if (salvo) qtds = JSON.parse(salvo); } catch(e){}
+try { const s = localStorage.getItem(chaveCarrinho); if (s) qtds = JSON.parse(s); } catch(e){}
 
-$("quem").textContent = !cliente ? "Atenção: Falta o código do cliente no link."
-  : !vendedor ? "Atenção: Falta o código do vendedor no link."
-  : "Pedido para: " + (nome || "cliente " + cliente);
+/* ---------- topo ---------- */
+$("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
+$("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
+$("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
+  : !vendedor ? "Atenção: falta o código do vendedor no link."
+  : "Escolha os produtos do seu curso e envie o pedido.";
+if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
+
+/* ---------- nome do produto: destaca o tom ---------- */
+function parseNome(n){
+  const m = n.match(/^([\/\d][\d\.\/]*L?)\s*-\s*(.+)$/i) || n.match(/^(\/\d+)\s+(.+)$/);
+  return m ? {tom: m[1], desc: m[2]} : {tom: null, desc: n};
+}
 
 /* ---------- carrinho e meta ---------- */
 function totais(){
@@ -174,41 +209,33 @@ function resumo(){
   $("total").textContent = brl(t);
   $("enviar").disabled = !linkOk || n === 0;
   $("verItens").disabled = n === 0;
-  
   if (n === 0 && !$("sheet").hidden) fecharSheet();
 
-  // ATUALIZA A BARRA DE META
   if (META_ATIVA) {
-      $("metaContainer").hidden = false;
-      let falta = META_VALOR - t;
-      let pct = (t / META_VALOR) * 100;
-      if (pct > 100) pct = 100;
-      
-      $("metaFill").style.width = pct + "%";
-      
-      if (t >= META_VALOR) {
-          $("metaTexto").innerHTML = `<span class="meta-ok">🎉 Meta atingida! Você garantiu o ${META_PREMIO}!</span>`;
-          $("metaFill").style.background = "var(--ok)";
-      } else {
-          $("metaTexto").innerHTML = `Faltam <b>${brl(falta)}</b> para ganhar: ${META_PREMIO}`;
-          $("metaFill").style.background = "var(--orchid)";
-      }
+    $("metaContainer").hidden = false;
+    const pct = Math.min(100, (t / META_VALOR) * 100);
+    $("metaFill").style.width = pct + "%";
+    if (t >= META_VALOR) {
+      $("metaTexto").innerHTML = `<span class="meta-ok">🎉 Meta atingida! Você garantiu o ${META_PREMIO}!</span>`;
+      $("metaFill").style.background = "var(--ok)";
+    } else {
+      $("metaTexto").innerHTML = `Faltam <b>${brl(META_VALOR - t)}</b> para ganhar: ${META_PREMIO}`;
+      $("metaFill").style.background = "var(--orchid)";
+    }
   }
 }
 
 function setQtd(id, v){
   v = Math.max(0, Math.min(999, parseInt(v) || 0));
   qtds[id] = v;
-  // Salva no navegador da cliente
   try { localStorage.setItem(chaveCarrinho, JSON.stringify(qtds)); } catch(e){}
-
   const el = $("i" + id);
   if (el) { el.querySelector("input").value = v; el.classList.toggle("on", v > 0); }
   resumo();
   if (!$("sheet").hidden) renderSheet();
 }
 
-/* ---------- janela "Revisar pedido" ---------- */
+/* ---------- janela "Seu pedido" ---------- */
 function abrirSheet(){ $("sMsg").textContent = ""; $("confirmar").disabled = false; $("sheet").hidden = false; $("overlay").hidden = false; renderSheet(); }
 function fecharSheet(){ $("sheet").hidden = true; $("overlay").hidden = true; }
 
@@ -219,12 +246,13 @@ function renderSheet(){
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", {numeric: true}))
     .forEach(p => {
       const k = qtds[p.id_produto];
+      const {tom, desc} = parseNome(p.nome);
       const row = document.createElement("div");
       row.className = "s-item";
-      row.innerHTML = `<div class="info"><div class="nome">${esc(p.nome)}</div>
+      row.innerHTML = `<div class="info"><div class="nome">${tom ? `<span class="tom">${esc(tom)}</span>` : ""}<span class="desc">${esc(desc)}</span></div>
         <div class="preco-normal">${k} × ${brl(p.preco)} = <b>${brl(k * p.preco)}</b></div></div>
         <div class="qty"><button data-d="-1" aria-label="Diminuir">−</button><span class="s-q">${k}</span><button data-d="1" aria-label="Aumentar">+</button></div>
-        <button class="rem" aria-label="Remover">🗑️</button>`;
+        <button class="rem" aria-label="Remover ${esc(p.nome)}">🗑️</button>`;
       row.querySelectorAll(".qty button").forEach(b => b.onclick = () => setQtd(p.id_produto, (qtds[p.id_produto] || 0) + +b.dataset.d));
       row.querySelector(".rem").onclick = () => setQtd(p.id_produto, 0);
       body.appendChild(row);
@@ -240,31 +268,27 @@ async function enviarPedido(){
   const itens = PRODUTOS.filter(p => qtds[p.id_produto] > 0)
     .map(p => ({id_produto: p.id_produto, quantidade: qtds[p.id_produto], preco: p.preco}));
   if (!itens.length) return;
-  
   enviando = true;
   $("confirmar").disabled = true;
   $("sMsg").className = ""; $("sMsg").textContent = "Lançando pedido no sistema...";
-  
   try {
     const r = await fetch(URL_ENVIAR_PEDIDO, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({curso, id_cliente: cliente, id_vendedor: vendedor, itens})
+      body: JSON.stringify({curso: curso || "CURSO", id_cliente: cliente, id_vendedor: vendedor, itens})
     });
     if (!r.ok) throw new Error(r.status);
-    
-    // Apaga a memória porque o pedido já foi enviado
-    try { localStorage.removeItem(chaveCarrinho); } catch(e){}
-    mostrarSucesso();
+    const res = totais();
+    try { localStorage.removeItem(chaveCarrinho); localStorage.setItem(chaveEnviado, JSON.stringify(res)); } catch(e){}
+    mostrarSucesso(res);
   } catch (e) {
     $("sMsg").className = "err"; $("sMsg").textContent = "Erro ao enviar. Verifique a internet e tente de novo.";
     $("confirmar").disabled = false;
   } finally { enviando = false; }
 }
 
-function mostrarSucesso(){
-  const {n, t} = totais();
-  $("okResumo").textContent = n + (n === 1 ? " item" : " itens") + " · " + brl(t);
+function mostrarSucesso(res){
+  $("okResumo").textContent = res.n + (res.n === 1 ? " item" : " itens") + " · " + brl(res.t);
   fecharSheet();
   ["topo", "lista", "rodape"].forEach(id => $(id).hidden = true);
   $("sucesso").hidden = false;
@@ -272,12 +296,12 @@ function mostrarSucesso(){
 }
 
 $("novo").onclick = () => {
-  Object.keys(qtds).forEach(k => delete qtds[k]);
-  try { localStorage.removeItem(chaveCarrinho); } catch(e){}
+  qtds = {};
+  try { localStorage.removeItem(chaveCarrinho); localStorage.removeItem(chaveEnviado); } catch(e){}
   MARCA_ATUAL = null;
   ["topo", "lista", "rodape"].forEach(id => $(id).hidden = false);
   $("sucesso").hidden = true;
-  montarTela(); resumo();
+  if (PRODUTOS.length) { montarTela(); resumo(); } else carregarProdutos();
 };
 
 $("verItens").onclick = abrirSheet;
@@ -287,37 +311,25 @@ $("fechar").onclick = fecharSheet;
 $("overlay").onclick = fecharSheet;
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) fecharSheet(); });
 
-/* ---------- catálogo e limpeza de dados ---------- */
+/* ---------- catálogo ---------- */
 async function carregarProdutos(){
+  $("lista").innerHTML = '<div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
   try {
-    const resposta = await fetch(URL_BUSCAR_PRODUTOS);
-    const listaSuja = await resposta.json();
-    
-    // NOVA LIMPEZA (SUPER FILTRO)
-    PRODUTOS = listaSuja.filter(p => {
-        // Função para tirar acentos e jogar tudo pra minúsculo
-        const limparTexto = (texto) => (texto || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-
-        const n = limparTexto(p.nome);
-        const m = limparTexto(p.marca);
-        const c = limparTexto(p.categoria);
-
-        // 1. Bloqueia palavras no NOME do produto
-        const bloqueiaNome = n.includes("indisponivel") || n.includes("disponivel em");
-
-        // 2. Bloqueia palavras na CATEGORIA do produto
-        const bloqueiaCategoria = c.includes("indisponivel") || c.includes("material de apoio") || c.includes("material apoio");
-
-        // 3. Bloqueia pela MARCA
-        const bloqueiaMarca = m.includes("apoio") || m.includes("material");
-
-        // Se NÃO cair em nenhum bloqueio, o produto passa!
-        return !bloqueiaNome && !bloqueiaCategoria && !bloqueiaMarca;
+    const r = await fetch(URL_BUSCAR_PRODUTOS);
+    if (!r.ok) throw new Error(r.status);
+    const suja = await r.json();
+    PRODUTOS = suja.filter(p => {
+      const n = norm(p.nome), m = norm(p.marca), c = norm(p.categoria);
+      const bloqNome = n.includes("indisponivel") || n.includes("disponivel em");
+      const bloqCat  = c.includes("indisponivel") || c.includes("material de apoio") || c.includes("material apoio");
+      const bloqMarca = m.includes("apoio") || m.includes("material");
+      return !bloqNome && !bloqCat && !bloqMarca;
     });
-
     montarTela();
+    resumo();
   } catch (e) {
-    $("lista").innerHTML = "<div id='loading'>Erro ao carregar os produtos.</div>";
+    $("lista").innerHTML = '<div id="loading">Não foi possível carregar os produtos.<br><br><button class="btn-voltar" id="tentar">Tentar de novo</button></div>';
+    $("tentar").onclick = carregarProdutos;
   }
 }
 
@@ -328,65 +340,97 @@ function montarTela(){
   else desenharTelaDeProdutos(lista, MARCA_ATUAL);
 }
 
+const marcaValida = m => !!m && !["ingresso", "estagio"].includes(norm(m));
+
+function criarItem(p){
+  const {tom, desc} = parseNome(p.nome);
+  const htmlPreco = (p.preco_de && p.preco_de > p.preco)
+    ? `<div class="bloco-preco"><span class="preco-de">DE ${brl(p.preco_de)}</span><span class="preco-por">POR ${brl(p.preco)}</span></div>`
+    : `<div class="bloco-preco"><span class="preco-normal">${brl(p.preco)}</span></div>`;
+  const foto = FOTOS_PASTA ? `<img class="foto" src="${FOTOS_PASTA}/foto_${p.id_produto}.jpg" alt="" loading="lazy" onerror="this.remove()">` : "";
+  const v = qtds[p.id_produto] || 0;
+  const el = document.createElement("div");
+  el.className = "item" + (v > 0 ? " on" : "");
+  el.id = "i" + p.id_produto;
+  el.dataset.t = norm(p.nome);
+  el.innerHTML = `${foto}<div class="info"><div class="nome">${tom ? `<span class="tom">${esc(tom)}</span>` : ""}<span class="desc">${esc(desc)}</span></div>${htmlPreco}</div>
+    <div class="qty">
+      <button class="add">Adicionar</button>
+      <div class="stepper">
+        <button aria-label="Diminuir" data-d="-1">−</button>
+        <input type="number" inputmode="numeric" min="0" max="999" value="${v}" aria-label="Quantidade">
+        <button aria-label="Aumentar" data-d="1">+</button>
+      </div>
+    </div>`;
+  el.querySelector(".add").onclick = () => setQtd(p.id_produto, 1);
+  el.querySelectorAll(".stepper button").forEach(b => b.onclick = () => setQtd(p.id_produto, (qtds[p.id_produto] || 0) + +b.dataset.d));
+  el.querySelector("input").onchange = e => setQtd(p.id_produto, e.target.value);
+  return el;
+}
+
 function desenharTelaDeMarcas(container){
-  let marcas = [...new Set(PRODUTOS.map(p => p.marca).filter(Boolean))]
-    .filter(m => {
-        const marcaLimpada = m.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-        return !["ingresso", "estagio"].includes(marcaLimpada);
-    });
+  const marcas = [...new Set(PRODUTOS.map(p => p.marca).filter(marcaValida))];
 
   const sh = document.createElement("div");
   sh.className = "sticky-header";
-  sh.innerHTML = "<h2>Escolha uma Marca</h2>";
+  sh.innerHTML = '<h2>Escolha uma marca ou busque um produto</h2>';
+  const busca = document.createElement("input");
+  busca.type = "search"; busca.className = "search-box"; busca.placeholder = "Buscar em todas as marcas...";
+  sh.appendChild(busca);
   container.appendChild(sh);
 
   const grid = document.createElement("div");
   grid.className = "grid-opcoes";
   marcas.forEach(marca => {
-    const qm = PRODUTOS.filter(p => p.marca === marca && qtds[p.id_produto] > 0).reduce((acc, p) => acc + qtds[p.id_produto], 0);
+    const qm = PRODUTOS.filter(p => p.marca === marca && qtds[p.id_produto] > 0).reduce((a, p) => a + qtds[p.id_produto], 0);
     const card = document.createElement("div");
     card.className = "card-opcao";
-    card.innerHTML = `<div class="card-titulo">${esc(marca)}</div>` +
-      (qm ? `<div class="badge">${qm} na sacola</div>` : "");
+    card.innerHTML = `<div class="card-titulo">${esc(marca)}</div>` + (qm ? `<div class="badge">${qm} na sacola</div>` : "");
     card.onclick = () => { MARCA_ATUAL = marca; montarTela(); window.scrollTo(0, 0); };
     grid.appendChild(card);
   });
   container.appendChild(grid);
+
+  const resultados = document.createElement("div");
+  resultados.className = "lista-itens";
+  resultados.hidden = true;
+  container.appendChild(resultados);
+
+  busca.addEventListener("input", e => {
+    const t = norm(e.target.value).trim();
+    if (t.length < 2) { grid.hidden = false; resultados.hidden = true; return; }
+    grid.hidden = true; resultados.hidden = false; resultados.innerHTML = "";
+    const achados = PRODUTOS.filter(p => marcaValida(p.marca) && norm(p.nome + " " + p.marca).includes(t)).slice(0, 60);
+    if (!achados.length) { resultados.innerHTML = '<div class="vazio">Nenhum produto encontrado.</div>'; return; }
+    achados.forEach(p => resultados.appendChild(criarItem(p)));
+  });
 }
 
 function desenharTelaDeProdutos(container, marca){
   const sh = document.createElement("div");
   sh.className = "sticky-header";
-
   const btnVoltar = document.createElement("button");
   btnVoltar.className = "btn-voltar";
   btnVoltar.textContent = "← Voltar para Marcas";
   btnVoltar.onclick = () => { MARCA_ATUAL = null; montarTela(); };
   sh.appendChild(btnVoltar);
-
-  const hMarca = document.createElement("h2");
-  hMarca.textContent = `Catálogo: ${marca}`;
-  sh.appendChild(hMarca);
-
-  const searchInput = document.createElement("input");
-  searchInput.type = "search";
-  searchInput.className = "search-box";
-  searchInput.placeholder = "Buscar nome (ex: 6.4)...";
-  sh.appendChild(searchInput);
+  const h = document.createElement("h2");
+  h.textContent = `Catálogo: ${marca}`;
+  sh.appendChild(h);
+  const busca = document.createElement("input");
+  busca.type = "search"; busca.className = "search-box"; busca.placeholder = "Buscar nome (ex: 6.4)...";
+  sh.appendChild(busca);
   container.appendChild(sh);
 
-  const produtosDaMarca = PRODUTOS.filter(p => p.marca === marca);
-  produtosDaMarca.sort((a, b) => {
-    const numA = parseFloat(a.nome.match(/^[\/\d\.]+/)?.[0]);
-    const numB = parseFloat(b.nome.match(/^[\/\d\.]+/)?.[0]);
-    if (!isNaN(numA) && !isNaN(numB)) {
-      if (numA !== numB) return numA - numB;
-      return a.nome.localeCompare(b.nome);
-    }
+  const produtos = PRODUTOS.filter(p => p.marca === marca);
+  produtos.sort((a, b) => {
+    const nA = parseFloat(a.nome.match(/^[\/\d\.]+/)?.[0]);
+    const nB = parseFloat(b.nome.match(/^[\/\d\.]+/)?.[0]);
+    if (!isNaN(nA) && !isNaN(nB)) { if (nA !== nB) return nA - nB; return a.nome.localeCompare(b.nome); }
     return a.nome.localeCompare(b.nome, "pt-BR", {numeric: true});
   });
 
-  const categorias = [...new Set(produtosDaMarca.map(p => p.categoria).filter(Boolean))];
+  const categorias = [...new Set(produtos.map(p => p.categoria).filter(Boolean))];
   categorias.sort((a, b) => {
     if (a.toLowerCase() === "combo") return -1;
     if (b.toLowerCase() === "combo") return 1;
@@ -397,46 +441,35 @@ function desenharTelaDeProdutos(container, marca){
     const bloco = document.createElement("div");
     bloco.className = "categoria-bloco";
     bloco.innerHTML = `<div class="categoria-titulo">${esc(cat)}</div>`;
-
-    produtosDaMarca.filter(p => p.categoria === cat).forEach(p => {
-      const htmlPreco = (p.preco_de && p.preco_de > p.preco)
-        ? `<div class="bloco-preco"><span class="preco-de">DE ${brl(p.preco_de)}</span> <span class="preco-por">POR ${brl(p.preco)}</span></div>`
-        : `<div class="bloco-preco"><span class="preco-normal">${brl(p.preco)}</span></div>`;
-
-      const v = qtds[p.id_produto] || 0;
-      const el = document.createElement("div");
-      el.className = "item" + (v > 0 ? " on" : "");
-      el.id = "i" + p.id_produto;
-      el.innerHTML = `<div class="info"><div class="nome">${esc(p.nome)}</div>${htmlPreco}</div>
-        <div class="qty">
-          <button aria-label="Diminuir" data-d="-1">−</button>
-          <input type="number" inputmode="numeric" min="0" max="999" value="${v}" aria-label="Quantidade">
-          <button aria-label="Aumentar" data-d="1">+</button>
-        </div>`;
-      const inp = el.querySelector("input");
-      el.querySelectorAll("button").forEach(b => b.onclick = () => setQtd(p.id_produto, (qtds[p.id_produto] || 0) + +b.dataset.d));
-      inp.onchange = () => setQtd(p.id_produto, inp.value);
-      bloco.appendChild(el);
-    });
+    const itens = document.createElement("div");
+    itens.className = "lista-itens";
+    produtos.filter(p => p.categoria === cat).forEach(p => itens.appendChild(criarItem(p)));
+    bloco.appendChild(itens);
     container.appendChild(bloco);
   });
 
-  searchInput.addEventListener("input", e => {
-    const termo = e.target.value.toLowerCase();
+  busca.addEventListener("input", e => {
+    const t = norm(e.target.value).trim();
     container.querySelectorAll(".categoria-bloco").forEach(bloco => {
       let vis = false;
-      bloco.querySelectorAll(".item").forEach(item => {
-        const ok = item.querySelector(".nome").textContent.toLowerCase().includes(termo);
-        item.style.display = ok ? "flex" : "none";
+      bloco.querySelectorAll(".item").forEach(it => {
+        const ok = it.dataset.t.includes(t);
+        it.style.display = ok ? "" : "none";
         if (ok) vis = true;
       });
-      bloco.style.display = vis ? "block" : "none";
+      bloco.style.display = vis ? "" : "none";
     });
   });
 }
 
-carregarProdutos();
-resumo();
+/* ---------- início ---------- */
+(function iniciar(){
+  let enviado = null;
+  try { enviado = JSON.parse(localStorage.getItem(chaveEnviado) || "null"); } catch(e){}
+  if (enviado) mostrarSucesso(enviado);
+  else carregarProdutos();
+  resumo();
+})();
 </script>
 </body>
 </html>
