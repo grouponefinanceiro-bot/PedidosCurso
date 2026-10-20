@@ -1,4 +1,4 @@
-<!DOCTYPE html>\\
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -46,7 +46,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--orchid);outline
 .s-q{min-width:28px;text-align:center;font-weight:700}
 .rem{background:none;border:0;color:var(--err);font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;padding:8px 4px}
 
-/* NOVO ESTILO DO RODAPÉ (INCLUINDO BARRA DE PROGRESSO) */
+/* ESTILO DO RODAPÉ (INCLUINDO BARRA DE PROGRESSO) */
 footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:200; display: flex; flex-direction: column;}
 .meta-box{background:var(--bg);padding:10px 20px;text-align:center;font-size:.85rem; border-bottom:1px solid var(--line);}
 .meta-texto{font-weight:600;color:var(--plum);margin-bottom:6px}
@@ -71,7 +71,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 #sheetBody{overflow-y:auto;padding:8px 20px;flex:1}
 .sheet-foot{display:flex;align-items:center;gap:16px;padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--card)}
 .sheet-foot>div{flex:1}.sheet-foot small{display:block;color:var(--muted)}.sheet-foot b{font-size:1.2rem}
-#sMsg{padding:0 20px 8px;font-weight:600}
+#sMsg{padding:0 20px 8px;font-weight:600; text-align: right;}
 .ok{color:var(--ok)}.err{color:var(--err)}
 
 #sucesso{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
@@ -119,7 +119,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 
 <section id="sucesso" hidden>
   <div class="check" aria-hidden="true">✓</div>
-  <h2>Pedido enviado com sucesso!</h2>
+  <h2>Pedido enviado!</h2>
   <p id="okResumo"></p>
   <p>Recebemos o seu pedido. Em breve o vendedor responsável entrará em contato.</p>
   <button class="principal" id="novo">Fazer um novo pedido</button>
@@ -132,7 +132,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 const URL_BUSCAR_PRODUTOS = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/produtos-curso";
 const URL_ENVIAR_PEDIDO   = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/receber-pedido-curso";
 
-// CONFIGURAÇÃO DO PRÊMIO / META DE VENDAS
+// CONFIGURAÇÃO DA META DE VENDAS
 const META_ATIVA  = true; // Mude para false para esconder a barra
 const META_VALOR  = 3000.00; // Valor que a cliente precisa atingir
 const META_PREMIO = "Estágio Bonificado"; // Nome do prêmio
@@ -293,16 +293,26 @@ async function carregarProdutos(){
     const resposta = await fetch(URL_BUSCAR_PRODUTOS);
     const listaSuja = await resposta.json();
     
-    // FILTRO: Tira material de apoio e itens indisponíveis
+    // NOVA LIMPEZA (SUPER FILTRO)
     PRODUTOS = listaSuja.filter(p => {
-        const n = (p.nome || "").toLowerCase();
-        const m = (p.marca || "").toLowerCase();
-        const c = (p.categoria || "").toLowerCase();
-        
-        const isIndisponivel = n.includes("indisponivel") || n.includes("indisponível");
-        const isApoio = m === "material apoio" || m === "material de apoio" || c === "material apoio" || c === "material de apoio";
-        
-        return !isIndisponivel && !isApoio;
+        // Função para tirar acentos e jogar tudo pra minúsculo
+        const limparTexto = (texto) => (texto || "").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+        const n = limparTexto(p.nome);
+        const m = limparTexto(p.marca);
+        const c = limparTexto(p.categoria);
+
+        // 1. Bloqueia palavras no NOME do produto
+        const bloqueiaNome = n.includes("indisponivel") || n.includes("disponivel em");
+
+        // 2. Bloqueia palavras na CATEGORIA do produto
+        const bloqueiaCategoria = c.includes("indisponivel") || c.includes("material de apoio") || c.includes("material apoio");
+
+        // 3. Bloqueia pela MARCA
+        const bloqueiaMarca = m.includes("apoio") || m.includes("material");
+
+        // Se NÃO cair em nenhum bloqueio, o produto passa!
+        return !bloqueiaNome && !bloqueiaCategoria && !bloqueiaMarca;
     });
 
     montarTela();
@@ -320,7 +330,10 @@ function montarTela(){
 
 function desenharTelaDeMarcas(container){
   let marcas = [...new Set(PRODUTOS.map(p => p.marca).filter(Boolean))]
-    .filter(m => !["ingresso", "estágio", "estagio"].includes(m.toLowerCase()));
+    .filter(m => {
+        const marcaLimpada = m.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        return !["ingresso", "estagio"].includes(marcaLimpada);
+    });
 
   const sh = document.createElement("div");
   sh.className = "sticky-header";
