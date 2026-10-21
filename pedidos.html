@@ -108,12 +108,59 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 .lista-regras{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px;color:var(--ink);font-size:.95rem;line-height:1.5}
 .lista-regras li b{color:var(--plum)}
 
-/* SUCESSO */
+/* TELA DE SUCESSO E LISTAGEM DE ITENS */
 #sucesso{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
-.check{width:84px;height:84px;border-radius:50%;background:var(--ok);color:#fff;font-size:3rem;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-#sucesso h2{margin:0 0 8px;color:var(--plum);font-size:1.6rem}
-#sucesso p{margin:4px 0;color:var(--muted);max-width:340px}
-#sucesso .principal{margin-top:28px}
+.check{width:84px;height:84px;border-radius:50%;background:var(--ok);color:#fff;font-size:3rem;display:flex;align-items:center;justify-content:center;margin-bottom:14px;flex-shrink:0}
+#sucesso h2{margin:0 0 4px;color:var(--plum);font-size:1.6rem}
+
+.sucesso-lista {
+  width: 100%;
+  max-width: 480px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 14px 0 10px;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 14px;
+}
+.sucesso-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.sucesso-item:last-child {
+  border-bottom: 0;
+}
+.sucesso-item-nome {
+  flex: 1;
+  padding-right: 10px;
+  line-height: 1.2;
+}
+.sucesso-item-qtd {
+  font-weight: 700;
+  color: var(--plum);
+  white-space: nowrap;
+}
+.sucesso-total-box {
+  margin-top: 4px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ok);
+}
+.btn-novo-pedido {
+  background: #d32f2f !important;
+  color: #fff !important;
+  margin-top: 20px;
+  transition: 0.2s;
+}
+.btn-novo-pedido:hover {
+  background: #b71c1c !important;
+}
 </style>
 </head>
 <body>
@@ -173,12 +220,16 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   </div>
 </section>
 
+<!-- TELA DE SUCESSO -->
 <section id="sucesso" hidden>
   <div class="check" aria-hidden="true">✓</div>
   <h2>Pedido enviado!</h2>
-  <p id="okResumo"></p>
-  <p>Recebemos o seu pedido. Em breve o vendedor responsável entrará em contato.</p>
-  <button class="principal" id="novo">Fazer um novo pedido</button>
+  
+  <div id="sucessoLista" class="sucesso-lista"></div>
+  <div id="okResumo" class="sucesso-total-box"></div>
+  
+  <p style="margin-top: 10px; color: var(--muted); max-width: 380px;">Recebemos o seu pedido. Em breve o vendedor responsável entrará em contato.</p>
+  <button class="principal btn-novo-pedido" id="novo">Fazer um novo pedido</button>
 </section>
 
 <script>
@@ -193,14 +244,14 @@ const FOTOS_PASTA = "";
 
 const META_ATIVA  = true;
 const META_VALOR  = 3000.00;
-const META_PREMIO = "Estágio";
+const META_PREMIO = "Estágio Bonificado";
 
 const SORTEIO_ATIVO = true;
 
-// ID DO FORNECEDOR QUE IDENTIFICA O "DESTAQUE DO CURSO"
+// ID DO FORNECEDOR QUE DEFINE O "DESTAQUE DO CURSO"
 const ID_FORNECEDOR_DESTAQUE = 328447;
 
-// ORDEM EXATA DOS BOTÕES
+// ORDEM DOS BOTÕES
 const ORDEM_MARCAS = [
   "OLENKA",
   "MUP",
@@ -227,6 +278,7 @@ const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BR
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+// Identificador da data para renovar o dia
 const dataHoje = new Date().toLocaleDateString("pt-BR");
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
 const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
@@ -250,7 +302,7 @@ $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
   : !vendedor ? "Atenção: falta o código do vendedor no link."
-  : "Escolha os produtos e envie o pedido.";
+  : "Escolha os produtos do seu curso e envie o pedido.";
 
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
@@ -347,11 +399,18 @@ function renderSheet(){
 async function enviarPedido(){
   if (enviando) return;
   const itens = PRODUTOS.filter(p => qtds[p.id_produto] > 0)
-    .map(p => ({id_produto: p.id_produto, quantidade: qtds[p.id_produto], preco: p.preco}));
+    .map(p => ({
+      id_produto: p.id_produto, 
+      nome: p.nome,
+      quantidade: qtds[p.id_produto], 
+      preco: p.preco
+    }));
+
   if (!itens.length) return;
   enviando = true;
   $("confirmar").disabled = true;
   $("sMsg").className = ""; $("sMsg").textContent = "Lançando pedido no sistema...";
+  
   try {
     const r = await fetch(URL_ENVIAR_PEDIDO, {
       method: "POST",
@@ -361,16 +420,20 @@ async function enviarPedido(){
         id_cliente: cliente,
         id_vendedor: vendedor,
         numero_sorteio: numeroSorteio,
-        itens
+        itens: itens.map(i => ({ id_produto: i.id_produto, quantidade: i.quantidade, preco: i.preco }))
       })
     });
     if (!r.ok) throw new Error(r.status);
-    const res = totais();
+    
+    const { n, t } = totais();
+    const pedidoSalvo = { n, t, itens };
+
     try { 
       localStorage.removeItem(chaveCarrinho); 
-      localStorage.setItem(chaveEnviado, JSON.stringify(res)); 
+      localStorage.setItem(chaveEnviado, JSON.stringify(pedidoSalvo)); 
     } catch(e){}
-    mostrarSucesso(res);
+    
+    mostrarSucesso(pedidoSalvo);
   } catch (e) {
     $("sMsg").className = "err"; $("sMsg").textContent = "Erro ao enviar. Verifique a internet e tente de novo.";
     $("confirmar").disabled = false;
@@ -378,7 +441,23 @@ async function enviarPedido(){
 }
 
 function mostrarSucesso(res){
-  $("okResumo").textContent = res.n + (res.n === 1 ? " item" : " itens") + " · " + brl(res.t);
+  const containerLista = $("sucessoLista");
+  containerLista.innerHTML = "";
+
+  if (res.itens && res.itens.length) {
+    res.itens.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "sucesso-item";
+      row.innerHTML = `
+        <div class="sucesso-item-nome">${esc(item.nome)}</div>
+        <div class="sucesso-item-qtd">${item.quantidade}x &middot; ${brl(item.preco * item.quantidade)}</div>
+      `;
+      containerLista.appendChild(row);
+    });
+  }
+
+  $("okResumo").textContent = `Total: ${res.n} ${res.n === 1 ? 'item' : 'itens'} · ${brl(res.t)}`;
+  
   fecharSheet();
   fecharRegras();
   ["topo", "lista", "rodape"].forEach(id => $(id).hidden = true);
@@ -478,8 +557,6 @@ function criarItem(p){
 
 function desenharTelaDeMarcas(container){
   const marcasApi = [...new Set(PRODUTOS.map(p => p.marca).filter(marcaValida))];
-
-  // Identifica se tem algum produto com o fornecedor do destaque
   const temDestaque = PRODUTOS.some(p => Number(p.id_fornecedor) === ID_FORNECEDOR_DESTAQUE);
 
   const marcasOrdenadas = [];
@@ -571,7 +648,6 @@ function desenharTelaDeProdutos(container, marca){
   sh.appendChild(busca);
   container.appendChild(sh);
 
-  // FILTRA POR FORNECEDOR QUANDO FOR "DESTAQUE DO CURSO", OU PELA MARCA NORMAL
   const produtos = PRODUTOS.filter(p => {
     if (marca === "DESTAQUE DO CURSO") return Number(p.id_fornecedor) === ID_FORNECEDOR_DESTAQUE;
     return norm(p.marca) === norm(marca);
@@ -620,7 +696,7 @@ function desenharTelaDeProdutos(container, marca){
 (function iniciar(){
   let enviado = null;
   try { enviado = JSON.parse(localStorage.getItem(chaveEnviado) || "null"); } catch(e){}
-  if (enviado) mostrarSucesso(enviado);
+  if (enviado && enviado.itens) mostrarSucesso(enviado);
   else carregarProdutos();
   resumo();
 })();
