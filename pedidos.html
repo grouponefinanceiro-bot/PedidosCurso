@@ -193,7 +193,7 @@ const FOTOS_PASTA = "";
 
 const META_ATIVA  = true;
 const META_VALOR  = 3000.00;
-const META_PREMIO = "Estágio Bonificado";
+const META_PREMIO = "Estágio";
 
 const SORTEIO_ATIVO = true;
 
@@ -250,7 +250,7 @@ $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
   : !vendedor ? "Atenção: falta o código do vendedor no link."
-  : "Escolha os produtos do seu curso e envie o pedido.";
+  : "Escolha os produtos e envie o pedido.";
 
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
