@@ -208,8 +208,8 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   </div>
   <div id="regrasBody">
     <ol class="lista-regras">
-      <li><b>Exclusividade Diária:</b> Cada participante recebe 1 número da sorte único por dia, intransferível e sem repetição.</li>
-      <li><b>Validade do Número:</b> O número é válido exclusivamente para os sorteios realizados na data da sua emissão.</li>
+      <li><b>Exclusividade Semanal:</b> Cada participante recebe 1 número da sorte único válido por 7 dias, intransferível e sem repetição.</li>
+      <li><b>Validade do Número:</b> O número é válido para as apurações realizadas no período de vigência da sua edição.</li>
       <li><b>Presença no Evento:</b> Para ter direito ao prêmio sorteado, o participante deverá estar presente no local no momento da apuração.</li>
       <li><b>Envio do Pedido:</b> Para validar o ticket, o participante deverá ter enviado ao menos uma lista de pedidos durante o evento.</li>
       <li><b>Retirada do Prêmio:</b> O prêmio deverá ser conferido e retirado diretamente com o instrutor ou vendedor responsável ao término da aula.</li>
@@ -278,7 +278,7 @@ const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BR
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-// Validade de 7 dias no navegador do cliente
+// Controle de validade de 7 dias no navegador
 const DIAS_VALIDADE_MS = 7 * 24 * 60 * 60 * 1000;
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
 const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
@@ -287,21 +287,18 @@ const chaveData     = "tempo_acesso_"   + (cliente || "teste") + "_" + (curso ||
 try {
   const agora = Date.now();
   const primeiroAcesso = parseInt(localStorage.getItem(chaveData) || "0");
-  
   if (!primeiroAcesso || (agora - primeiroAcesso > DIAS_VALIDADE_MS)) {
-    // Passou dos 7 dias: limpa o histórico para um novo ciclo
     localStorage.removeItem(chaveCarrinho);
     localStorage.removeItem(chaveEnviado);
     localStorage.setItem(chaveData, agora.toString());
   }
 } catch(e){}
 
-
 let qtds = {};
 try { const s = localStorage.getItem(chaveCarrinho); if (s) qtds = JSON.parse(s); } catch(e){}
 
-/* ---------- topo ---------- */
-$("data").textContent = dataHoje;
+/* ---------- TOPO ---------- */
+$("data").textContent = new Date().toLocaleDateString("pt-BR", {day:"2-digit",month:"2-digit",year:"numeric"});
 $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
@@ -310,13 +307,13 @@ $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no lin
 
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
-/* ---------- nome do produto: destaca o tom ---------- */
+/* ---------- NOME DO PRODUTO: DESTACA O TOM ---------- */
 function parseNome(n){
   const m = n.match(/^([\/\d][\d\.\/]*L?)\s*-\s*(.+)$/i) || n.match(/^(\/\d+)\s+(.+)$/);
   return m ? {tom: m[1], desc: m[2]} : {tom: null, desc: n};
 }
 
-/* ---------- carrinho e meta ---------- */
+/* ---------- CARRINHO E META ---------- */
 function totais(){
   let n = 0, t = 0;
   PRODUTOS.forEach(p => { const k = qtds[p.id_produto] || 0; n += k; t += k * p.preco; });
@@ -369,7 +366,7 @@ function setQtd(id, v){
   if (!$("sheet").hidden) renderSheet();
 }
 
-/* ---------- modais ---------- */
+/* ---------- MODAIS (PEDIDO E REGRAS) ---------- */
 function abrirSheet(){ $("sMsg").textContent = ""; $("confirmar").disabled = false; $("sheet").hidden = false; $("overlay").hidden = false; renderSheet(); }
 function fecharSheet(){ $("sheet").hidden = true; $("overlay").hidden = true; }
 
@@ -399,7 +396,7 @@ function renderSheet(){
   $("sTotal").textContent = brl(t);
 }
 
-/* ---------- envio e tela de sucesso ---------- */
+/* ---------- ENVIO E TELA DE SUCESSO COM LISTA ---------- */
 async function enviarPedido(){
   if (enviando) return;
   const itens = PRODUTOS.filter(p => qtds[p.id_produto] > 0)
@@ -489,7 +486,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") { fecharSheet(); fecharRegras(); }
 });
 
-/* ---------- catálogo e produtos ---------- */
+/* ---------- CATÁLOGO E PRODUTOS ---------- */
 async function carregarProdutos(){
   $("lista").innerHTML = '<div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
   try {
@@ -696,7 +693,7 @@ function desenharTelaDeProdutos(container, marca){
   });
 }
 
-/* ---------- início ---------- */
+/* ---------- INÍCIO ---------- */
 (function iniciar(){
   let enviado = null;
   try { enviado = JSON.parse(localStorage.getItem(chaveEnviado) || "null"); } catch(e){}
