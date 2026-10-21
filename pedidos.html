@@ -303,7 +303,7 @@ $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
   : !vendedor ? "Atenção: falta o código do vendedor no link."
-  : "Escolha os produtos do seu curso e envie o pedido.";
+  : "Escolha seus produtos e envie o pedido.";
 
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
