@@ -24,6 +24,9 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 .hero h1{margin:6px 0 4px;font-size:1.8rem;font-weight:800;text-transform:capitalize}
 .who{margin:0;opacity:.92;font-size:.95rem}
 
+/* TICKET DE SORTEIO */
+.ticket-sorteio{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1200;padding:6px 14px;border-radius:8px;font-weight:800;font-size:.95rem;margin-top:12px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+
 .sticky-header{position:sticky;top:0;background:var(--bg);z-index:100;padding:10px 20px 15px;margin:0 -20px;border-bottom:1px solid var(--line);box-shadow:0 4px 10px rgba(0,0,0,.03)}
 .sticky-header h2{font-size:1.1rem;margin:12px 0 8px;color:var(--plum)}
 .search-box{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font:inherit;color:var(--ink);font-size:1rem}
@@ -113,6 +116,12 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   <div class="hero-top"><div class="eyebrow" id="eyebrow">Pedido do curso</div><div class="data" id="data"></div></div>
   <h1 id="saudacao">Bem-vinda</h1>
   <p class="who" id="quem"></p>
+  
+  <!-- BOTÃO DO SORTEIO -->
+  <div id="blocoSorteio" class="ticket-sorteio" hidden>
+    🎟️ Seu Número da Sorte: <span id="numSorteio"></span>
+  </div>
+
 </div></header>
 
 <main id="lista"><div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></main>
@@ -152,12 +161,17 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 const URL_BUSCAR_PRODUTOS = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/produtos-curso";
 const URL_ENVIAR_PEDIDO   = "https://n8n-pmua.srv1793031.hstgr.cloud/webhook/receber-pedido-curso";
 
-const LOGO_URL    = "";        // ex.: "logo.png" (deixe vazio para não mostrar)
-const FOTOS_PASTA = "";        // ex.: "fotos" -> procura fotos/foto_<id>.jpg (vazio = sem fotos)
+const LOGO_URL    = "";        
+const FOTOS_PASTA = "";        
 
 const META_ATIVA  = true;
 const META_VALOR  = 3000.00;
 const META_PREMIO = "Estágio Bonificado";
+
+// CONFIGURAÇÃO DO SORTEIO
+const SORTEIO_ATIVO = true; // true para ligar, false para desligar
+const SORTEIO_MIN   = 1;    // Menor número possível
+const SORTEIO_MAX   = 30;   // Maior número possível (001 a 030)
 // ============================================
 
 let PRODUTOS = [];
@@ -177,8 +191,24 @@ const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u030
 
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
 const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
+const chaveSorteio  = "sorteio_curso_"  + (cliente || "teste") + "_" + (curso || "");
+
 let qtds = {};
 try { const s = localStorage.getItem(chaveCarrinho); if (s) qtds = JSON.parse(s); } catch(e){}
+
+/* ---------- LÓGICA DO SORTEIO ---------- */
+let numeroSorteio = null;
+if (SORTEIO_ATIVO && linkOk) {
+    // Tenta puxar o número salvo na memória
+    numeroSorteio = localStorage.getItem(chaveSorteio);
+    
+    // Se não tiver, sorteia um número novo e salva
+    if (!numeroSorteio) {
+        const sorteado = Math.floor(Math.random() * (SORTEIO_MAX - SORTEIO_MIN + 1)) + SORTEIO_MIN;
+        numeroSorteio = String(sorteado).padStart(3, '0'); // Formata com 3 dígitos (ex: 005, 030)
+        localStorage.setItem(chaveSorteio, numeroSorteio);
+    }
+}
 
 /* ---------- topo ---------- */
 $("data").textContent = new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
@@ -187,7 +217,14 @@ $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerC
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
   : !vendedor ? "Atenção: falta o código do vendedor no link."
   : "Escolha os produtos do seu curso e envie o pedido.";
+
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
+
+// Mostra o bilhete se o sorteio estiver ativo
+if (numeroSorteio) {
+    $("numSorteio").textContent = numeroSorteio;
+    $("blocoSorteio").hidden = false;
+}
 
 /* ---------- nome do produto: destaca o tom ---------- */
 function parseNome(n){
@@ -288,11 +325,16 @@ async function enviarPedido(){
     const r = await fetch(URL_ENVIAR_PEDIDO, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({curso: curso || "CURSO", id_cliente: cliente, id_vendedor: vendedor, itens})
+      // AQUI ENVIAMOS O NÚMERO DO SORTEIO PARA O N8N:
+      body: JSON.stringify({curso: curso || "CURSO", id_cliente: cliente, id_vendedor: vendedor, numero_sorteio: numeroSorteio, itens})
     });
     if (!r.ok) throw new Error(r.status);
     const res = totais();
-    try { localStorage.removeItem(chaveCarrinho); localStorage.setItem(chaveEnviado, JSON.stringify(res)); } catch(e){}
+    try { 
+        localStorage.removeItem(chaveCarrinho); 
+        localStorage.removeItem(chaveSorteio); // Limpa o número para o próximo pedido!
+        localStorage.setItem(chaveEnviado, JSON.stringify(res)); 
+    } catch(e){}
     mostrarSucesso(res);
   } catch (e) {
     $("sMsg").className = "err"; $("sMsg").textContent = "Erro ao enviar. Verifique a internet e tente de novo.";
@@ -314,6 +356,16 @@ $("novo").onclick = () => {
   MARCA_ATUAL = null;
   ["topo", "lista", "rodape"].forEach(id => $(id).hidden = false);
   $("sucesso").hidden = true;
+  
+  // Como é um pedido novo, gera um ticket de sorteio novo se estiver ativo
+  if (SORTEIO_ATIVO && linkOk) {
+      const sorteado = Math.floor(Math.random() * (SORTEIO_MAX - SORTEIO_MIN + 1)) + SORTEIO_MIN;
+      numeroSorteio = String(sorteado).padStart(3, '0');
+      localStorage.setItem(chaveSorteio, numeroSorteio);
+      $("numSorteio").textContent = numeroSorteio;
+      $("blocoSorteio").hidden = false;
+  }
+  
   if (PRODUTOS.length) { montarTela(); resumo(); } else carregarProdutos();
 };
 
