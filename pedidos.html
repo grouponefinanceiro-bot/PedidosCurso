@@ -6,18 +6,20 @@
 <title>Pedido do curso</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf7fb;--ink:#231a26;--muted:#6f6474;--plum:#4a1d4e;--orchid:#b4488d;--line:#e6dce8;--card:#fff;--ok:#1f7a4d;--okbg:#eef7f2;--err:#b3261e;--hover:#fdf5fc;--skel:#efe6f1}
-@media (prefers-color-scheme:dark){:root{--bg:#1b141e;--ink:#f3ecf5;--muted:#a99bb0;--plum:#e8c9ec;--orchid:#d878b5;--line:#3a2d3f;--card:#251b29;--ok:#6fd3a0;--okbg:#16382a;--err:#ff8a80;--hover:#2e2233;--skel:#2d2233}}
+:root{--bg:#f4f7fd;--ink:#0f1b3d;--muted:#5d6b8a;--plum:#14308f;--orchid:#2f5bea;--line:#d9e2f5;--card:#fff;--ok:#1f7a4d;--okbg:#eaf6ef;--err:#b3261e;--hover:#eef3ff;--skel:#e3eaf9;--gold:#ffb020}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1630;--ink:#eef2ff;--muted:#9fb0d9;--plum:#b9c8ff;--orchid:#5b82ff;--line:#26335e;--card:#16203f;--ok:#6fd3a0;--okbg:#16382a;--err:#ff8a80;--hover:#1b2850;--skel:#1d2a52}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;padding-bottom:140px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;padding-bottom:100px}
 button:focus-visible,input:focus-visible{outline:3px solid var(--orchid);outline-offset:2px}
 main{max-width:960px;margin:0 auto;padding:0 20px}
 
 /* TOPO */
-.hero{background:linear-gradient(135deg,#4a1d4e,#9b3a7c);color:#fff;padding:26px 20px 24px}
+.hero{background:linear-gradient(135deg,#0c2268,#2f5bea);color:#fff;padding:22px 20px 24px}
 .hero-in{max-width:960px;margin:0 auto}
 .hero img{height:36px;margin-bottom:12px;display:block}
+.hero-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.data{font-size:.8rem;font-weight:700;background:rgba(255,255,255,.18);padding:4px 12px;border-radius:20px;white-space:nowrap}
 .eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:700}
 .hero h1{margin:6px 0 4px;font-size:1.8rem;font-weight:800;text-transform:capitalize}
 .who{margin:0;opacity:.92;font-size:.95rem}
@@ -32,7 +34,10 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 .card-opcao:hover,.card-opcao:active{border-color:var(--orchid);background:var(--hover);transform:translateY(-1px)}
 .card-titulo{font-weight:800;font-size:1.05rem;color:var(--plum);line-height:1.3}
 .badge{background:var(--orchid);color:#fff;font-size:.75rem;font-weight:700;border-radius:20px;padding:3px 10px}
-.btn-voltar{background:transparent;border:1px solid var(--plum);color:var(--plum);padding:8px 16px;border-radius:20px;font-weight:600;cursor:pointer;font-size:.9rem}
+.voltar-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.btn-voltar{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 16px;border-radius:12px;background:var(--gold);color:#1a1200;border:0;font:inherit;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 2px 6px rgba(255,176,32,.35)}
+.btn-voltar:active{transform:translateY(1px)}
+.marca-atual{font-weight:800;font-size:1.1rem;color:var(--plum);text-align:right;max-width:40%;line-height:1.1}
 .vazio{text-align:center;color:var(--muted);padding:30px 0}
 
 .categoria-bloco{margin-top:24px}
@@ -50,16 +55,13 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 .tom{font-weight:800;font-size:1.3rem;color:var(--plum)}
 .desc{font-weight:600;font-size:.9rem}
 .bloco-preco{display:flex;align-items:baseline;gap:8px;margin-top:6px;flex-wrap:wrap}
-.preco-de{font-size:.85rem;color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(179,38,30,.5);font-weight:600}
+.preco-de{font-size:.85rem;color:var(--muted);font-weight:600}
 .preco-por{font-size:1.05rem;color:var(--ok);font-weight:800;background:var(--okbg);padding:2px 8px;border-radius:6px}
 .preco-normal{font-size:.9rem;color:var(--muted);font-weight:600;margin-top:4px}
 
 .qty{display:flex;align-items:center;gap:6px}
 .stepper{display:flex;align-items:center;gap:6px}
 .qty button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1.3rem;cursor:pointer;touch-action:manipulation}
-.qty .add{width:auto;height:44px;border-radius:10px;padding:0 16px;background:var(--plum);color:var(--bg);border:0;font-weight:700;font-size:.9rem}
-.item.on .add{display:none}
-.item:not(.on) .stepper{display:none}
 .qty input{width:52px;height:44px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-weight:700}
 .s-q{min-width:28px;text-align:center;font-weight:700}
 .rem{background:none;border:0;color:var(--err);font:inherit;font-size:1.1rem;cursor:pointer;padding:8px 4px}
@@ -71,7 +73,7 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 
 /* RODAPÉ + META */
 footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:200;display:flex;flex-direction:column}
-.meta-box{background:var(--bg);padding:10px 20px;text-align:center;font-size:.85rem;border-bottom:1px solid var(--line)}
+.meta-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px 10px;margin-bottom:10px;text-align:center;font-size:.85rem}
 .meta-texto{font-weight:600;color:var(--plum);margin-bottom:6px}
 .meta-ok{color:var(--ok);font-size:.95rem}
 .meta-barra-bg{height:8px;background:var(--line);border-radius:4px;overflow:hidden;max-width:720px;margin:0 auto}
@@ -108,7 +110,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 <body>
 <header id="topo" class="hero"><div class="hero-in">
   <img id="logo" alt="" hidden>
-  <div class="eyebrow" id="eyebrow">Pedido do curso</div>
+  <div class="hero-top"><div class="eyebrow" id="eyebrow">Pedido do curso</div><div class="data" id="data"></div></div>
   <h1 id="saudacao">Bem-vinda</h1>
   <p class="who" id="quem"></p>
 </div></header>
@@ -116,10 +118,6 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
 <main id="lista"><div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></main>
 
 <footer id="rodape">
-  <div id="metaContainer" class="meta-box" hidden>
-    <div class="meta-texto" id="metaTexto"></div>
-    <div class="meta-barra-bg"><div class="meta-barra-fill" id="metaFill"></div></div>
-  </div>
   <div class="bar-container"><div class="bar">
     <button class="tot" id="verItens" disabled aria-label="Ver itens do pedido">
       <small id="qtd">0 itens</small><b id="total">R$ 0,00</b>
@@ -183,6 +181,7 @@ let qtds = {};
 try { const s = localStorage.getItem(chaveCarrinho); if (s) qtds = JSON.parse(s); } catch(e){}
 
 /* ---------- topo ---------- */
+$("data").textContent = new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
 $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
@@ -211,18 +210,32 @@ function resumo(){
   $("verItens").disabled = n === 0;
   if (n === 0 && !$("sheet").hidden) fecharSheet();
 
-  if (META_ATIVA) {
-    $("metaContainer").hidden = false;
-    const pct = Math.min(100, (t / META_VALOR) * 100);
-    $("metaFill").style.width = pct + "%";
+  atualizarMeta(t);
+}
+
+function criarMeta(){
+  if (!META_ATIVA) return null;
+  const d = document.createElement("div");
+  d.className = "meta-box js-meta";
+  d.innerHTML = '<div class="meta-texto"></div><div class="meta-barra-bg"><div class="meta-barra-fill"></div></div>';
+  atualizarMeta(totais().t, d);
+  return d;
+}
+
+function atualizarMeta(t, so){
+  if (!META_ATIVA) return;
+  const pct = Math.min(100, (t / META_VALOR) * 100);
+  (so ? [so] : document.querySelectorAll(".js-meta")).forEach(box => {
+    const txt = box.querySelector(".meta-texto"), fill = box.querySelector(".meta-barra-fill");
+    fill.style.width = pct + "%";
     if (t >= META_VALOR) {
-      $("metaTexto").innerHTML = `<span class="meta-ok">🎉 Meta atingida! Você garantiu o ${META_PREMIO}!</span>`;
-      $("metaFill").style.background = "var(--ok)";
+      txt.innerHTML = `<span class="meta-ok">🎉 Meta atingida! Você garantiu o ${META_PREMIO}!</span>`;
+      fill.style.background = "var(--ok)";
     } else {
-      $("metaTexto").innerHTML = `Faltam <b>${brl(META_VALOR - t)}</b> para ganhar: ${META_PREMIO}`;
-      $("metaFill").style.background = "var(--orchid)";
+      txt.innerHTML = `Faltam <b>${brl(META_VALOR - t)}</b> para ganhar: ${META_PREMIO}`;
+      fill.style.background = "var(--orchid)";
     }
-  }
+  });
 }
 
 function setQtd(id, v){
@@ -355,14 +368,12 @@ function criarItem(p){
   el.dataset.t = norm(p.nome);
   el.innerHTML = `${foto}<div class="info"><div class="nome">${tom ? `<span class="tom">${esc(tom)}</span>` : ""}<span class="desc">${esc(desc)}</span></div>${htmlPreco}</div>
     <div class="qty">
-      <button class="add">Adicionar</button>
       <div class="stepper">
         <button aria-label="Diminuir" data-d="-1">−</button>
         <input type="number" inputmode="numeric" min="0" max="999" value="${v}" aria-label="Quantidade">
         <button aria-label="Aumentar" data-d="1">+</button>
       </div>
     </div>`;
-  el.querySelector(".add").onclick = () => setQtd(p.id_produto, 1);
   el.querySelectorAll(".stepper button").forEach(b => b.onclick = () => setQtd(p.id_produto, (qtds[p.id_produto] || 0) + +b.dataset.d));
   el.querySelector("input").onchange = e => setQtd(p.id_produto, e.target.value);
   return el;
@@ -373,7 +384,8 @@ function desenharTelaDeMarcas(container){
 
   const sh = document.createElement("div");
   sh.className = "sticky-header";
-  sh.innerHTML = '<h2>Escolha uma marca ou busque um produto</h2>';
+  sh.innerHTML = '<h2>Escolha uma marca</h2>';
+  const meta = criarMeta(); if (meta) sh.prepend(meta);
   const busca = document.createElement("input");
   busca.type = "search"; busca.className = "search-box"; busca.placeholder = "Buscar em todas as marcas...";
   sh.appendChild(busca);
@@ -409,16 +421,20 @@ function desenharTelaDeMarcas(container){
 function desenharTelaDeProdutos(container, marca){
   const sh = document.createElement("div");
   sh.className = "sticky-header";
+  const meta = criarMeta(); if (meta) sh.appendChild(meta);
+  const linha = document.createElement("div");
+  linha.className = "voltar-row";
   const btnVoltar = document.createElement("button");
   btnVoltar.className = "btn-voltar";
-  btnVoltar.textContent = "← Voltar para Marcas";
-  btnVoltar.onclick = () => { MARCA_ATUAL = null; montarTela(); };
-  sh.appendChild(btnVoltar);
-  const h = document.createElement("h2");
-  h.textContent = `Catálogo: ${marca}`;
-  sh.appendChild(h);
+  btnVoltar.textContent = "← Voltar para as marcas";
+  btnVoltar.onclick = () => { MARCA_ATUAL = null; montarTela(); window.scrollTo(0, 0); };
+  const tag = document.createElement("div");
+  tag.className = "marca-atual";
+  tag.textContent = marca;
+  linha.append(btnVoltar, tag);
+  sh.appendChild(linha);
   const busca = document.createElement("input");
-  busca.type = "search"; busca.className = "search-box"; busca.placeholder = "Buscar nome (ex: 6.4)...";
+  busca.type = "search"; busca.className = "search-box"; busca.placeholder = "Buscar";
   sh.appendChild(busca);
   container.appendChild(sh);
 
