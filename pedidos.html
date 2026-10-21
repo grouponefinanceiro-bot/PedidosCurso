@@ -153,9 +153,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   </div>
 </section>
 
-<!-- ======================================================= -->
-<!-- MODAL: REGRAS DO SORTEIO (EDITE SUAS REGRAS AQUI ABAIXO)-->
-<!-- ======================================================= -->
+<!-- MODAL: REGRAS DO SORTEIO -->
 <section id="modalRegras" role="dialog" aria-modal="true" aria-label="Regras do sorteio" hidden>
   <div class="sheet-head">
     <h3>Regras do Sorteio</h3>
@@ -199,7 +197,10 @@ const META_PREMIO = "Estágio Bonificado";
 
 const SORTEIO_ATIVO = true;
 
-// ORDEM EXATA DAS MARCAS SOLICITADA
+// ID DO FORNECEDOR QUE IDENTIFICA O "DESTAQUE DO CURSO"
+const ID_FORNECEDOR_DESTAQUE = 328447;
+
+// ORDEM EXATA DOS BOTÕES
 const ORDEM_MARCAS = [
   "OLENKA",
   "MUP",
@@ -226,7 +227,6 @@ const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BR
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-// Identificador do dia atual para limpeza diária
 const dataHoje = new Date().toLocaleDateString("pt-BR");
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
 const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
@@ -313,7 +313,7 @@ function setQtd(id, v){
   if (!$("sheet").hidden) renderSheet();
 }
 
-/* ---------- janela "Seu pedido" e "Regras" ---------- */
+/* ---------- modais ---------- */
 function abrirSheet(){ $("sMsg").textContent = ""; $("confirmar").disabled = false; $("sheet").hidden = false; $("overlay").hidden = false; renderSheet(); }
 function fecharSheet(){ $("sheet").hidden = true; $("overlay").hidden = true; }
 
@@ -406,7 +406,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") { fecharSheet(); fecharRegras(); }
 });
 
-/* ---------- catálogo e entrega do número da sorte ---------- */
+/* ---------- catálogo e produtos ---------- */
 async function carregarProdutos(){
   $("lista").innerHTML = '<div id="loading"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
   try {
@@ -477,22 +477,21 @@ function criarItem(p){
 }
 
 function desenharTelaDeMarcas(container){
-  // Pega as marcas existentes nos produtos vindos da API
   const marcasApi = [...new Set(PRODUTOS.map(p => p.marca).filter(marcaValida))];
 
-  // Organiza exatamente na ordem desejada
+  // Identifica se tem algum produto com o fornecedor do destaque
+  const temDestaque = PRODUTOS.some(p => Number(p.id_fornecedor) === ID_FORNECEDOR_DESTAQUE);
+
   const marcasOrdenadas = [];
   ORDEM_MARCAS.forEach(ordem => {
-    const achada = marcasApi.find(m => norm(m) === norm(ordem));
-    if (achada) marcasOrdenadas.push(achada);
-    else if (ordem === "DESTAQUE DO CURSO") {
-      // Se não veio da API como marca mas tem produtos nessa categoria
-      const temDestaque = PRODUTOS.some(p => norm(p.categoria).includes("destaque"));
+    if (ordem === "DESTAQUE DO CURSO") {
       if (temDestaque) marcasOrdenadas.push("DESTAQUE DO CURSO");
+    } else {
+      const achada = marcasApi.find(m => norm(m) === norm(ordem));
+      if (achada) marcasOrdenadas.push(achada);
     }
   });
 
-  // Se houver alguma outra marca não prevista, joga pro final
   marcasApi.forEach(m => {
     if (!marcasOrdenadas.some(mo => norm(mo) === norm(m))) {
       marcasOrdenadas.push(m);
@@ -511,9 +510,12 @@ function desenharTelaDeMarcas(container){
   const grid = document.createElement("div");
   grid.className = "grid-opcoes";
 
-  // Cria os botões das marcas organizadas
   marcasOrdenadas.forEach(marca => {
-    const qm = PRODUTOS.filter(p => (norm(p.marca) === norm(marca) || (marca === "DESTAQUE DO CURSO" && norm(p.categoria).includes("destaque"))) && qtds[p.id_produto] > 0).reduce((a, p) => a + qtds[p.id_produto], 0);
+    const qm = PRODUTOS.filter(p => {
+      if (marca === "DESTAQUE DO CURSO") return Number(p.id_fornecedor) === ID_FORNECEDOR_DESTAQUE;
+      return norm(p.marca) === norm(marca);
+    }).reduce((a, p) => a + (qtds[p.id_produto] || 0), 0);
+
     const card = document.createElement("div");
     card.className = "card-opcao";
     card.innerHTML = `<div class="card-titulo">${esc(marca)}</div>` + (qm ? `<div class="badge">${qm} na sacola</div>` : "");
@@ -521,7 +523,6 @@ function desenharTelaDeMarcas(container){
     grid.appendChild(card);
   });
 
-  // Adiciona o Botão Especial: SORTEIOS (REGRAS)
   if (SORTEIO_ATIVO) {
     const cardSorteio = document.createElement("div");
     cardSorteio.className = "card-opcao";
@@ -570,8 +571,9 @@ function desenharTelaDeProdutos(container, marca){
   sh.appendChild(busca);
   container.appendChild(sh);
 
+  // FILTRA POR FORNECEDOR QUANDO FOR "DESTAQUE DO CURSO", OU PELA MARCA NORMAL
   const produtos = PRODUTOS.filter(p => {
-    if (marca === "DESTAQUE DO CURSO") return norm(p.categoria).includes("destaque");
+    if (marca === "DESTAQUE DO CURSO") return Number(p.id_fornecedor) === ID_FORNECEDOR_DESTAQUE;
     return norm(p.marca) === norm(marca);
   });
 
