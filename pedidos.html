@@ -278,20 +278,24 @@ const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BR
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-// Identificador da data para renovar o dia
-const dataHoje = new Date().toLocaleDateString("pt-BR");
+// Validade de 7 dias no navegador do cliente
+const DIAS_VALIDADE_MS = 7 * 24 * 60 * 60 * 1000;
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
 const chaveEnviado  = "enviado_curso_"  + (cliente || "teste") + "_" + (curso || "");
-const chaveData     = "data_acesso_"    + (cliente || "teste") + "_" + (curso || "");
+const chaveData     = "tempo_acesso_"   + (cliente || "teste") + "_" + (curso || "");
 
 try {
-  const ultimaData = localStorage.getItem(chaveData);
-  if (ultimaData && ultimaData !== dataHoje) {
+  const agora = Date.now();
+  const primeiroAcesso = parseInt(localStorage.getItem(chaveData) || "0");
+  
+  if (!primeiroAcesso || (agora - primeiroAcesso > DIAS_VALIDADE_MS)) {
+    // Passou dos 7 dias: limpa o histórico para um novo ciclo
     localStorage.removeItem(chaveCarrinho);
     localStorage.removeItem(chaveEnviado);
+    localStorage.setItem(chaveData, agora.toString());
   }
-  localStorage.setItem(chaveData, dataHoje);
 } catch(e){}
+
 
 let qtds = {};
 try { const s = localStorage.getItem(chaveCarrinho); if (s) qtds = JSON.parse(s); } catch(e){}
