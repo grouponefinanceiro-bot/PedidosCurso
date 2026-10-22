@@ -24,8 +24,9 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 .hero h1{margin:6px 0 4px;font-size:1.8rem;font-weight:800;text-transform:capitalize}
 .who{margin:0;opacity:.92;font-size:.95rem}
 
-/* TICKET DE SORTEIO */
-.ticket-sorteio{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1200;padding:6px 14px;border-radius:8px;font-weight:800;font-size:.95rem;margin-top:12px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+/* TICKET DE SORTEIO - MAIOR */
+.ticket-sorteio{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:#1a1200;padding:8px 18px;border-radius:10px;font-weight:800;font-size:1.15rem;margin-top:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.ticket-sorteio span{font-size:1.45rem;letter-spacing:.05em;background:#1a1200;color:var(--gold);padding:2px 10px;border-radius:6px;line-height:1}
 
 .sticky-header{position:sticky;top:0;background:var(--bg);z-index:100;padding:10px 20px 15px;margin:0 -20px;border-bottom:1px solid var(--line);box-shadow:0 4px 10px rgba(0,0,0,.03)}
 .sticky-header h2{font-size:1.1rem;margin:12px 0 8px;color:var(--plum)}
@@ -39,10 +40,16 @@ main{max-width:960px;margin:0 auto;padding:0 20px}
 .card-sub{font-size:.78rem;color:var(--muted);font-weight:600}
 .badge{background:var(--orchid);color:#fff;font-size:.75rem;font-weight:700;border-radius:20px;padding:3px 10px;margin-top:4px}
 
+/* CARD DO REPRESENTANTE (DESTACADO E INFORMATIVO) */
+.card-vendedor{background:linear-gradient(135deg,#102a75,#1d49ba);border:2px solid #ffb020;border-radius:16px;padding:22px 12px;text-align:center;box-shadow:0 4px 14px rgba(20,48,143,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;cursor:default}
+.card-vendedor .v-tag{font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffb020}
+.card-vendedor .v-nome{font-size:1.15rem;font-weight:800;color:#fff}
+
+/* BOTÃO VOLTAR - LETRA MAIOR */
 .voltar-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
-.btn-voltar{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 16px;border-radius:12px;background:var(--gold);color:#1a1200;border:0;font:inherit;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 2px 6px rgba(255,176,32,.35)}
+.btn-voltar{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:12px 18px;border-radius:12px;background:var(--gold);color:#1a1200;border:0;font:inherit;font-weight:800;font-size:1.15rem;cursor:pointer;box-shadow:0 3px 8px rgba(255,176,32,.35)}
 .btn-voltar:active{transform:translateY(1px)}
-.marca-atual{font-weight:800;font-size:1.1rem;color:var(--plum);text-align:right;max-width:40%;line-height:1.1}
+.marca-atual{font-weight:800;font-size:1.15rem;color:var(--plum);text-align:right;max-width:40%;line-height:1.1}
 .vazio{text-align:center;color:var(--muted);padding:30px 0}
 
 .categoria-bloco{margin-top:24px}
@@ -171,7 +178,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   <p class="who" id="quem"></p>
   
   <div id="blocoSorteio" class="ticket-sorteio" hidden>
-    🎟️ Seu Número da Sorte: <span id="numSorteio"></span>
+    🎟️ Seu Número da Sorte: <span id="numSorteio">---</span>
   </div>
 
 </div></header>
@@ -209,7 +216,7 @@ footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:
   <div id="regrasBody">
     <ol class="lista-regras">
       <li><b>Exclusividade Semanal:</b> Cada participante recebe 1 número da sorte único válido por 7 dias, intransferível e sem repetição.</li>
-      <li><b>Validade do Número:</b> O número é válido para as apurações realizadas no período de vigência da sua edição.</li>
+      <li><b>Validade do Número:</b> O número é válido para as apurações realizadas no período do curso.</li>
       <li><b>Presença no Evento:</b> Para ter direito ao prêmio sorteado, o participante deverá estar presente no local no momento da apuração.</li>
       <li><b>Envio do Pedido:</b> Para validar o ticket, o participante deverá ter enviado ao menos uma lista de pedidos durante o evento.</li>
       <li><b>Retirada do Prêmio:</b> O prêmio deverá ser conferido e retirado diretamente com o instrutor ou vendedor responsável ao término da aula.</li>
@@ -244,12 +251,19 @@ const FOTOS_PASTA = "";
 
 const META_ATIVA  = true;
 const META_VALOR  = 3000.00;
-const META_PREMIO = "Estágio";
+const META_PREMIO = "Estágio Bonificado";
 
 const SORTEIO_ATIVO = true;
 
 // ID DO FORNECEDOR QUE DEFINE O "DESTAQUE DO CURSO"
 const ID_FORNECEDOR_DESTAQUE = 328447;
+
+// MAPEAMENTO DOS VENDEDORES POR ID
+const NOMES_VENDEDORES = {
+  "20552": "Luiz",
+  "22853": "Daniel",
+  "160797": "João"
+};
 
 // ORDEM DOS BOTÕES
 const ORDEM_MARCAS = [
@@ -278,6 +292,9 @@ const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BR
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+// Identifica o nome do vendedor responsável
+const nomeVendedor = NOMES_VENDEDORES[vendedor] || (vendedor ? `ID ${vendedor}` : "Equipe");
+
 // Controle de validade de 7 dias no navegador
 const DIAS_VALIDADE_MS = 7 * 24 * 60 * 60 * 1000;
 const chaveCarrinho = "carrinho_curso_" + (cliente || "teste") + "_" + (curso || "");
@@ -303,7 +320,7 @@ $("eyebrow").textContent = "Pedido do curso" + (curso ? " · " + curso : "");
 $("saudacao").textContent = nome ? "Olá, " + nome.trim().split(" ")[0].toLowerCase() : "Bem-vinda";
 $("quem").textContent = !cliente ? "Atenção: falta o código do cliente no link."
   : !vendedor ? "Atenção: falta o código do vendedor no link."
-  : "Escolha seus produtos e envie o pedido.";
+  : "Escolha os produtos do seu curso e envie o pedido.";
 
 if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
@@ -316,7 +333,11 @@ function parseNome(n){
 /* ---------- CARRINHO E META ---------- */
 function totais(){
   let n = 0, t = 0;
-  PRODUTOS.forEach(p => { const k = qtds[p.id_produto] || 0; n += k; t += k * p.preco; });
+  PRODUTOS.forEach(p => { 
+    const k = qtds[p.id_produto] || 0; 
+    n += k; 
+    t += k * p.preco; 
+  });
   return {n, t};
 }
 
@@ -358,7 +379,11 @@ function atualizarMeta(t, so){
 
 function setQtd(id, v){
   v = Math.max(0, Math.min(999, parseInt(v) || 0));
-  qtds[id] = v;
+  if (v === 0) {
+    delete qtds[id];
+  } else {
+    qtds[id] = v;
+  }
   try { localStorage.setItem(chaveCarrinho, JSON.stringify(qtds)); } catch(e){}
   const el = $("i" + id);
   if (el) { el.querySelector("input").value = v; el.classList.toggle("on", v > 0); }
@@ -376,7 +401,7 @@ function fecharRegras(){ $("modalRegras").hidden = true; $("overlay").hidden = t
 function renderSheet(){
   const body = $("sheetBody");
   body.innerHTML = "";
-  PRODUTOS.filter(p => qtds[p.id_produto] > 0)
+  PRODUTOS.filter(p => (qtds[p.id_produto] || 0) > 0)
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", {numeric: true}))
     .forEach(p => {
       const k = qtds[p.id_produto];
@@ -396,10 +421,10 @@ function renderSheet(){
   $("sTotal").textContent = brl(t);
 }
 
-/* ---------- ENVIO E TELA DE SUCESSO COM LISTA ---------- */
+/* ---------- ENVIO E TELA DE SUCESSO ---------- */
 async function enviarPedido(){
   if (enviando) return;
-  const itens = PRODUTOS.filter(p => qtds[p.id_produto] > 0)
+  const itens = PRODUTOS.filter(p => (qtds[p.id_produto] || 0) > 0)
     .map(p => ({
       id_produto: p.id_produto, 
       nome: p.nome,
@@ -429,6 +454,8 @@ async function enviarPedido(){
     const { n, t } = totais();
     const pedidoSalvo = { n, t, itens };
 
+    // Limpa o carrinho totalmente (incluindo destaques)
+    qtds = {};
     try { 
       localStorage.removeItem(chaveCarrinho); 
       localStorage.setItem(chaveEnviado, JSON.stringify(pedidoSalvo)); 
@@ -601,6 +628,7 @@ function desenharTelaDeMarcas(container){
     grid.appendChild(card);
   });
 
+  // BOTÃO: SORTEIOS (REGRAS)
   if (SORTEIO_ATIVO) {
     const cardSorteio = document.createElement("div");
     cardSorteio.className = "card-opcao";
@@ -611,6 +639,15 @@ function desenharTelaDeMarcas(container){
     cardSorteio.onclick = abrirRegras;
     grid.appendChild(cardSorteio);
   }
+
+  // BOTÃO: REPRESENTANTE (DESTAQUE VISUAL ELEGANTE)
+  const cardRep = document.createElement("div");
+  cardRep.className = "card-vendedor";
+  cardRep.innerHTML = `
+    <div class="v-tag">Representante</div>
+    <div class="v-nome">${esc(nomeVendedor)}</div>
+  `;
+  grid.appendChild(cardRep);
 
   container.appendChild(grid);
 
